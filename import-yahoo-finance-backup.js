@@ -1,47 +1,102 @@
-(async function importYahooFinanceData(json) {
-    const data = typeof json === "string" ? JSON.parse(json) : json;
+;!(function importYahooData(json) {
+    // Parse JSON if it is a string
+    var data = json || {};
+    if (typeof json === "string")
+    {
+        data = JSON.parse(json) || {};
+    }
+
+    if (!data) { return; }
 
     // Restore LocalStorage
-    if(data.localStorage){
-        for(const key in data.localStorage){
-            localStorage.setItem(key, data.localStorage[key]);
+    if (data.localStorage && window.localStorage && window.localStorage.setItem)
+    {
+        for (var key in data.localStorage)
+        {
+            if (data.localStorage.hasOwnProperty(key))
+            {
+                window.localStorage.setItem(key, data.localStorage[key]);
+            }
+        }
+    }
+
+    // Restore SessionStorage
+    if (data.sessionStorage && window.sessionStorage && window.sessionStorage.setItem)
+    {
+        for (var key in data.sessionStorage)
+        {
+            if (data.sessionStorage.hasOwnProperty(key))
+            {
+                window.sessionStorage.setItem(key, data.sessionStorage[key]);
+            }
+        }
+    }
+
+    // Restore readable cookies
+    if (data.cookies)
+    {
+        var cookies = data.cookies.split("; ");
+        var len     = +cookies.length || 0;
+        for (var i = 0; i < len; ++i)
+        {
+            document.cookie = cookies[i] + "; path=/";
         }
     }
 
     // Restore IndexedDB
-    if(data.indexedDB){
-        for(const dbName in data.indexedDB){
-            const dbReq = indexedDB.open(dbName);
-            dbReq.onupgradeneeded = function(event){
-                const db = event.target.result;
-                const stores = data.indexedDB[dbName];
-                for(const storeName in stores){
-                    if(!db.objectStoreNames.contains(storeName)){
-                        db.createObjectStore(storeName, {autoIncrement:true});
+    if (data.indexedDB && window.indexedDB && window.indexedDB.open)
+    {
+        for (var dbName in data.indexedDB)
+        {
+            if (!data.indexedDB.hasOwnProperty(dbName)) { continue; }
+
+            (function(dbName)
+            {
+                var dbReq = window.indexedDB.open(dbName);
+                dbReq.onupgradeneeded = function(event)
+                {
+                    var db     = event.target.result;
+                    var stores = data.indexedDB[dbName];
+                    for (var storeName in stores)
+                    {
+                        if (!stores.hasOwnProperty(storeName)) { continue; }
+                        if (!db.objectStoreNames.contains(storeName))
+                        {
+                            db.createObjectStore(storeName, { autoIncrement: true });
+                        }
                     }
-                }
-            };
-            dbReq.onsuccess = function(event){
-                const db = event.target.result;
-                const tx = db.transaction(db.objectStoreNames, 'readwrite');
-                for(const storeName in data.indexedDB[dbName]){
-                    const store = tx.objectStore(storeName);
-                    for(const record of data.indexedDB[dbName][storeName]){
-                        store.add(record);
+                };
+                
+                dbReq.onsuccess = function(event)
+                {
+                    var db = event.target.result;
+                    var tx = db.transaction(db.objectStoreNames, "readwrite");
+                    
+                    for (var storeName in data.indexedDB[dbName])
+                    {
+                        if (!data.indexedDB[dbName].hasOwnProperty(storeName)) { continue; }
+                        var store   = tx.objectStore(storeName);
+                        var records = data.indexedDB[dbName][storeName];
+                        var recLen  = +records.length || 0;
+                        for (var i = 0; i < recLen; ++i)
+                        {
+                            store.add(records[i]);
+                        }
                     }
-                }
-                tx.oncomplete = function(){ console.log(`IndexedDB restored: ${dbName}`);}
-            };
+                    
+                    tx.oncomplete = function()
+                    {
+                        console.log("IndexedDB restored for " + dbName);
+                    };
+                };
+                
+                dbReq.onerror = function()
+                {
+                    console.warn("Failed to open IndexedDB: " + dbName);
+                };
+            })(dbName);
         }
     }
 
-    // Restore cookies (non-HttpOnly)
-    if(data.cookies){
-        const cookies = data.cookies.split("; ");
-        for(const c of cookies){
-            document.cookie = c + "; path=/";
-        }
-    }
-
-    console.log("Data restore attempted. Reload page to apply.");
+    console.log("Data restore attempted. Reload page to apply changes.");
 })();
