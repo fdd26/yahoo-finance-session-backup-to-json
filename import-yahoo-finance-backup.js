@@ -32,7 +32,7 @@
         }
     }
 
-    // Restore readable cookies
+    // Restore Readable cookies (non http-only)
     if (data.cookies)
     {
         var cookies = data.cookies.split("; ");
