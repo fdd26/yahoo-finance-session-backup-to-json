@@ -11,11 +11,11 @@
     // Restore LocalStorage
     if (data.localStorage && window.localStorage && window.localStorage.setItem)
     {
-        for (var key in data.localStorage)
+        for (var lkey in data.localStorage)
         {
-            if (data.localStorage.hasOwnProperty(key))
+            if (data.localStorage.hasOwnProperty(lkey))
             {
-                window.localStorage.setItem(key, data.localStorage[key]);
+                window.localStorage.setItem(lkey, data.localStorage[lkey]);
             }
         }
     }
@@ -23,14 +23,14 @@
     // Restore SessionStorage
     if (data.sessionStorage && window.sessionStorage && window.sessionStorage.setItem)
     {
-        for (var key in data.sessionStorage)
+        for (var skey in data.sessionStorage)
         {
-            if (data.sessionStorage.hasOwnProperty(key))
+            if (data.sessionStorage.hasOwnProperty(skey))
             {
-                window.sessionStorage.setItem(key, data.sessionStorage[key]);
+                window.sessionStorage.setItem(skey, data.sessionStorage[skey]);
             }
         }
-    }
+    }}
 
     // Restore Readable cookies (non http-only)
     if (data.cookies)
