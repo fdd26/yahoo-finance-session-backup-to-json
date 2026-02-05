@@ -1,5 +1,6 @@
 ;!(function exportYahooFinanceData()
 {
+    var filename_prefix = 'yahoo_finance_backup.';
     var exportObj = {};
 
     // Export LocalStorage
@@ -91,14 +92,15 @@
 
         // Download JSON file
         var exportStr = JSON.stringify(exportObj, null, 2);
-        var blob   = new Blob([exportStr], { type: 'application/json' });
-        var url    = URL.createObjectURL(blob);
-        var a      = document.createElement('a');
-        a.href     = url;
-        a.download = 'yahoo_finance_backup.' + timestamp + '.json';
+        var blob      = new Blob([exportStr], { type: 'application/json' });
+        var url       = URL.createObjectURL(blob);
+        var filename  = filename_prefix + timestamp + '.json';
+        var a         = document.createElement('a');
+        a.href        = url;
+        a.download    = filename;
         a.click();
         URL.revokeObjectURL(url);
 
-        console.log('Export complete! File downloaded: yahoo_finance_backup.' + timestamp + '.json');
+        console.log('Export complete! File downloaded: ' + filename);
     });
 })();
