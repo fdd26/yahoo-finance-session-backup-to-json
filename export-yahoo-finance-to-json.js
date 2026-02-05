@@ -5,25 +5,25 @@
 
     // Export LocalStorage
     exportObj.localStorage = {};
-    var lsLen = window.localStorage && +localStorage.length || 0;
+    var lsLen = window.localStorage && +window.localStorage.length || 0;
     for (var i = 0; i < lsLen; ++i)
     {
-        var key = localStorage.key(i);
-        exportObj.localStorage[key] = localStorage.getItem(key);
+        var lkey = window.localStorage.key(i);
+        exportObj.localStorage[lkey] = window.localStorage.getItem(lkey);
     }
 
     // Export SessionStorage
     exportObj.sessionStorage = {};
-    var ssLen = window.sessionStorage && +sessionStorage.length || 0;
+    var ssLen = window.sessionStorage && +window.sessionStorage.length || 0;
     for (var i = 0; i < ssLen; ++i)
     {
-        var key = sessionStorage.key(i);
-        exportObj.sessionStorage[key] = sessionStorage.getItem(key);
+        var skey = window.sessionStorage.key(i);
+        exportObj.sessionStorage[skey] = window.sessionStorage.getItem(skey);
     }
 
     // Export IndexedDB
     exportObj.indexedDB = {};
-    if (window.indexedDB && indexedDB.databases)
+    if (window.indexedDB && window.indexedDB.databases && window.indexedDB.open)
     indexedDB.databases().then(function(dbs)
     {
         var dbCount = +dbs.length;
@@ -35,7 +35,7 @@
                 if (!dbName) return;
 
                 exportObj.indexedDB[dbName] = {};
-                var dbReq = indexedDB.open(dbName);
+                var dbReq = window.indexedDB.open(dbName);
                 dbReq.onsuccess = function(event)
                 {
                     var db = event.target.result;
@@ -45,7 +45,8 @@
                     if (storeLen === 0) return;
                     for (var j = 0; j < storeLen; ++j)
                     {
-                        (function(storeName) {
+                        (function(storeName)
+                        {
                             var store     = tx.objectStore(storeName);
                             var getAllReq = store.getAll();
                             
