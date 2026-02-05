@@ -6,25 +6,25 @@
     // Export LocalStorage
     exportObj.localStorage = {};
     var lsLen = window.localStorage && +window.localStorage.length || 0;
-    for (var i = 0; i < lsLen; ++i)
+    for (var li = 0; li < lsLen; ++li)
     {
-        var lkey = window.localStorage.key(i);
+        var lkey = window.localStorage.key(li);
         exportObj.localStorage[lkey] = window.localStorage.getItem(lkey);
     }
 
     // Export SessionStorage
     exportObj.sessionStorage = {};
     var ssLen = window.sessionStorage && +window.sessionStorage.length || 0;
-    for (var i = 0; i < ssLen; ++i)
+    for (var si = 0; si < ssLen; ++si)
     {
-        var skey = window.sessionStorage.key(i);
+        var skey = window.sessionStorage.key(si);
         exportObj.sessionStorage[skey] = window.sessionStorage.getItem(skey);
     }
 
     // Export IndexedDB
     exportObj.indexedDB = {};
     if (window.indexedDB && window.indexedDB.databases && window.indexedDB.open)
-    indexedDB.databases().then(function(dbs)
+    window.indexedDB.databases().then(function(dbs)
     {
         var dbCount = +dbs.length;
         for (var i = 0; i < dbCount; ++i)
